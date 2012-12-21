@@ -10,11 +10,8 @@
  	
 	<batch:job id="job1">
 		<batch:step id="step1"  >			
-			<batch:tasklet transaction-manager="transactionManager" start-limit="100" >
-				<batch:chunk reader="reader" writer="writer" commit-interval="1" />
-			</batch:tasklet>
+			<batch:tasklet ref="myFtpGetRemoteFilesTasklet" />
 		</batch:step>
 	</batch:job> 
-	
 
 </beans>

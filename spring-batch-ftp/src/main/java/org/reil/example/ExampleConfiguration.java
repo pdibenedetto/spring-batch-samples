@@ -1,5 +1,7 @@
 package org.reil.example;
 
+import java.io.File;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -10,6 +12,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.integration.file.remote.session.SessionFactory;
+import org.springframework.integration.ftp.session.DefaultFtpSessionFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -32,6 +37,10 @@ public class ExampleConfiguration {
 	@Qualifier("jobRepository")
 	private JobRepository jobRepository;
 
+	@Autowired
+	@Qualifier("myFtpSessionFactory")
+	private SessionFactory myFtpSessionFactory;
+	
 	@Bean
 	public DataSource dataSource() {
 		BasicDataSource dataSource = new BasicDataSource();
@@ -42,6 +51,37 @@ public class ExampleConfiguration {
 		return dataSource;
 	}
 
+	@Bean
+	@Scope(value="step")
+	public FtpGetRemoteFilesTasklet myFtpGetRemoteFilesTasklet()
+	{
+		FtpGetRemoteFilesTasklet  ftpTasklet = new FtpGetRemoteFilesTasklet();
+		ftpTasklet.setRetryIfNotFound(true);
+		ftpTasklet.setDownloadFileAttempts(3);
+		ftpTasklet.setRetryIntervalMilliseconds(10000);
+		ftpTasklet.setFileNamePattern("README");
+		//ftpTasklet.setFileNamePattern("TestFile");
+		ftpTasklet.setRemoteDirectory("/");
+		ftpTasklet.setLocalDirectory(new File(System.getProperty("java.io.tmpdir")));
+		ftpTasklet.setSessionFactory(myFtpSessionFactory);
+		
+		return ftpTasklet;
+	}
+	
+	@Bean
+	public SessionFactory myFtpSessionFactory()
+	{
+		DefaultFtpSessionFactory ftpSessionFactory = new DefaultFtpSessionFactory();
+		ftpSessionFactory.setHost("ftp.gnu.org");
+		ftpSessionFactory.setClientMode(0);
+		ftpSessionFactory.setFileType(0);
+		ftpSessionFactory.setPort(21);
+		ftpSessionFactory.setUsername("anonymous");
+		ftpSessionFactory.setPassword("anonymous");
+		
+		return ftpSessionFactory;
+	}
+	
 	@Bean
 	public SimpleJobLauncher jobLauncher() {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();

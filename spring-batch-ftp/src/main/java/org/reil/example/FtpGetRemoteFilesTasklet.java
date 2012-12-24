@@ -79,16 +79,7 @@ public class FtpGetRemoteFilesTasklet implements Tasklet, InitializingBean
         Assert.notNull(remoteDirectory, "remoteDirectory attribute cannot be null");
         Assert.notNull(fileNamePattern, "fileNamePattern attribute cannot be null");
       
-
-        if (isSftp())
-        {
-            ftpInboundFileSynchronizer = new SftpInboundFileSynchronizer(sessionFactory);
-        }
-        else
-        {
-            ftpInboundFileSynchronizer = new FtpInboundFileSynchronizer(sessionFactory);
-        }
-        ftpInboundFileSynchronizer.setRemoteDirectory(remoteDirectory);
+        setupFileSynchronizer();
 
         if (!this.localDirectory.exists())
         {
@@ -107,6 +98,21 @@ public class FtpGetRemoteFilesTasklet implements Tasklet, InitializingBean
         }
     }
 
+    private void setupFileSynchronizer()
+    {
+    	if (isSftp())
+        {
+            ftpInboundFileSynchronizer = new SftpInboundFileSynchronizer(sessionFactory);
+            ((SftpInboundFileSynchronizer) ftpInboundFileSynchronizer).setFilter(new SftpSimplePatternFileListFilter(fileNamePattern));
+        }
+        else
+        {
+            ftpInboundFileSynchronizer = new FtpInboundFileSynchronizer(sessionFactory);
+            ((FtpInboundFileSynchronizer) ftpInboundFileSynchronizer).setFilter(new FtpSimplePatternFileListFilter(fileNamePattern));
+        }
+        ftpInboundFileSynchronizer.setRemoteDirectory(remoteDirectory);
+    }
+    
     private void deleteLocalFiles()
     {
         if (deleteLocalFiles)
@@ -128,16 +134,7 @@ public class FtpGetRemoteFilesTasklet implements Tasklet, InitializingBean
      */
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception
     {
-    	if (isSftp())
-        {
-            ((SftpInboundFileSynchronizer) ftpInboundFileSynchronizer).setFilter(new SftpSimplePatternFileListFilter(fileNamePattern));
-        }
-        else
-        {
-            ((FtpInboundFileSynchronizer) ftpInboundFileSynchronizer).setFilter(new FtpSimplePatternFileListFilter(fileNamePattern));
-        }
-
-        deleteLocalFiles();
+    	deleteLocalFiles();
 
         ftpInboundFileSynchronizer.synchronizeToLocalDirectory(localDirectory);
 

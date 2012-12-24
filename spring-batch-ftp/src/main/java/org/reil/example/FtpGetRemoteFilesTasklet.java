@@ -26,24 +26,6 @@ import org.springframework.integration.sftp.inbound.SftpInboundFileSynchronizer;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.util.Assert;
 
-/**
- * Tasklet used to get remote file(s) via FTP.
- * 
- * @author cry
- * @version 1.0 Nov 25, 2011
- *          <p>
- * 
- *          <pre>
- *  =====================================================================*
- *  Copyright Notice 
- *  This file contains proprietary information of American Century.
- *  Copying or reproduction without prior written approval is prohibited.
- *  Copyright (c) 2011
- *  =====================================================================*
- * </pre>
- * 
- *          </p>
- */
 public class FtpGetRemoteFilesTasklet implements Tasklet, InitializingBean
 {
     private Logger logger = LoggerFactory.getLogger(FtpGetRemoteFilesTasklet.class);

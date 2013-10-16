@@ -2,7 +2,7 @@ package org.reil.example;
 
 import org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicy;
 
-public class LineMergingPolicy extends SuffixRecordSeparatorPolicy {
+public class CustomRecordSeparatorPolicy extends SuffixRecordSeparatorPolicy {
 	
 	private char delimiter = ',';
 	

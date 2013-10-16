@@ -60,14 +60,14 @@ public class JobConfiguration {
 	
 	@Bean
 	public FlatFileItemReader<Person> reader() {
-		FlatFileItemReader<Person> reader = new FlatFileItemReader<>();
+		FlatFileItemReader<Person> reader = new FlatFileItemReader<Person>();
 		reader.setResource(new ClassPathResource("testFile.txt"));
-		DefaultLineMapper<Person> lineMapper = new DefaultLineMapper<>();
+		DefaultLineMapper<Person> lineMapper = new DefaultLineMapper<Person>();
 		lineMapper.setFieldSetMapper(new PersonFieldSetMapper());
 		lineMapper.setLineTokenizer(new DelimitedLineTokenizer(','));
 		reader.setLineMapper(lineMapper);
 		//set the policy
-		LineMergingPolicy policy = new LineMergingPolicy();
+		CustomRecordSeparatorPolicy policy = new CustomRecordSeparatorPolicy();
 		policy.setSuffix("eor");
 		reader.setRecordSeparatorPolicy(policy);
 		
